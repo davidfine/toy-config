@@ -10,7 +10,7 @@ __author__ = 'dfine'
 
 from jinja2 import Environment, FileSystemLoader
 from configobj import ConfigObj
-import git # Should use gitpython instead
+import git
 import argparse
 import subprocess
 import logging
@@ -68,7 +68,7 @@ class config_actions(object):
         '''
 
 
-    def copy_file(self, source, destination)
+    def copy_file(self, source, destination):
         '''
         :param source: location of file relative to repo root
         :param destination: full path to destination on local fs
@@ -82,8 +82,8 @@ class config_actions(object):
         :param ATTRIBUTES: attributes dict, global
         :return: 0 if success else exception
         '''
-        template = TEMPLATE_ENV.get_template(name)
-        path = '/%s' % name
+        template = TEMPLATE_ENV.get_template(source)
+        path = '/%s' % source
         with open(path, 'w') as file:
             file.write(template.render(ATTRIBUTES=ATTRIBUTES))
             print("wrote file %s" % path)
@@ -97,13 +97,13 @@ def changed_files(REPO):
     '''
     commits_list = list(REPO.iter_commits())
     changed_files = []
-    [ changed_files.append(x.a_path) for x in commits_list[0].diff(commits_list[1]) if x.a_path not in changed_files]
-    [ changed_files.append(x.b_path) for x in commits_list[0].diff(commits_list[1]) if x.b_path not in changed_files]
+    changed_files.append([ x.a_path for x in commits_list[0].diff(commits_list[1]) if x.a_path not in changed_files ])
+    changed_files.append([ x.b_path for x in commits_list[0].diff(commits_list[1]) if x.b_path not in changed_files ])
     return changed_files
 
 
 if __name__ == '__main__':
-        if args.update:
-            apply_updates()
+    if args.update:
+        apply_updates()
     else:
         apply_full()
