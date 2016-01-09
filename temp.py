@@ -5,9 +5,6 @@ from TaskHandler import TaskHandler
 import logging
 from jinja2 import Environment, FileSystemLoader, Template
 
-task_handler = TaskHandler(runbook=RUN_BOOK, roles_dir=ROLES_DIR)
-
-
 
 def render(tpl_path, context):
     path, filename = os.path.split(tpl_path)

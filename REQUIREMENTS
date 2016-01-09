@@ -1,0 +1,6 @@
+GitPython==1.0.1
+Jinja2==2.8
+MarkupSafe==0.23
+PyYAML==3.11
+gitdb==0.6.4
+smmap==0.9.0

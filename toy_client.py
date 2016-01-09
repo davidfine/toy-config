@@ -18,11 +18,13 @@ import os
 import TaskHandler
 
 
-def apply_full(ROLES_DIR, RUN_BOOK):
-    ''' Run all actions in role configuration file '''
-    task_handler = TaskHandler(runbook=RUN_BOOK, roles_dir=ROLES_DIR)
+def apply_full(ROLES_DIR):
+    print('roles_dir:{}'.format(ROLES_DIR))
+    runbook = role_file_parser('{}/runbook.yml'.format(ROLES_DIR), 'all')
+    print('runbook:{}'.format(runbook))
+    task_handler = TaskHandler.TaskHandler(runbook=runbook, roles_dir=ROLES_DIR)
     update_repo(GIT_URL, ROLES_DIR)
-    for task in RUN_BOOK['tasks']:
+    for task in runbook['tasks']:
         output = task_handler.handle_task(task)
         LOGGER.info(output)
 
@@ -40,6 +42,7 @@ def start_logging():
 
 def update_repo(url, dir):
     ''' Pull repo, or clone if doens't exist '''
+    print(url, dir)
     try:
         if os.path.isdir(dir):
             g = git.cmd.Git(dir)
@@ -48,6 +51,7 @@ def update_repo(url, dir):
             git.Repo.clone_from(url, dir)
     except Exception as e:
         LOGGER.warn(e)
+        print(e)
 
 
 def role_file_parser(rolefile, section):
@@ -56,7 +60,7 @@ def role_file_parser(rolefile, section):
     :return: dict of a portion of rolefile
     '''
     with open(rolefile) as yamlfile:
-        parsed = yaml.load(yamlfile)['tasks']
+        parsed = yaml.load(yamlfile)
     if section == 'all':
         return parsed
     if section == 'tasks':
@@ -93,16 +97,11 @@ if __name__ == '__main__':
     ### Globals
     LOGGER = start_logging()
     ROLE = args.role
-    ROLE = 'toy-role' # testing
-    ROLES_DIR = '/temp/{}'.format(ROLE)
-    GIT_URL = 'https://github.com/davidfine/{}'.format(ROLE)
+    ROLES_DIR = '/tmp/{}'.format(ROLE)
+    GIT_URL = 'https://github.com/davidfine/toy-role.git'
+    print(GIT_URL)
     update_repo(GIT_URL, ROLES_DIR)
-    RUN_BOOK = role_file_parser('{}.runbook.yaml'.format(ROLES_DIR), 'all')
 
-
-    if args.update:
-        apply_updates(ROLES_DIR, RUN_BOOK)
-    else:
-        LOGGER.info('Applying full configuration')
-        apply_full(ROLES_DIR, RUN_BOOK)
+    LOGGER.info('Applying full configuration')
+    apply_full(ROLES_DIR)
 

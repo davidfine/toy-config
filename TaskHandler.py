@@ -9,10 +9,12 @@ class TaskHandler(object):
     :param attributes: dict of attributes including template variables
     """
 
-    def __init__(self, run_book, roles_dir):
-        self.attributes = run_book['attributes']
+    def __init__(self, runbook, roles_dir):
+        self.attributes = runbook['attributes']
         self.templates_dir = '{}/templates'.format(roles_dir)
-        self.jinja_environmenent = jinja2.Environment(loader=jinja2.FileSystemLoader(templates_dir))
+        self.jinja_environmenent = jinja2.Environment(loader=jinja2.FileSystemLoader(self.templates_dir))
+        self.roles_dir = roles_dir
+
 
     def handle_task(self, task):
         if task['action'] == 'commands':
@@ -27,6 +29,7 @@ class TaskHandler(object):
         elif task['action'] == 'template':
                 output = self.copy_template_to_file(source=task['source'], destination=task['destination'])
                 return output
+
 
     def run_command(self, command):
         '''
@@ -44,10 +47,11 @@ class TaskHandler(object):
         :param destination: full path to destination on local fs
         :return: 0 if success else exception
         '''
-        shutil.copyfile(source, destination)
+        path = '{}/files/{}'.format(self.roles_dir, source)
+        shutil.copyfile(path, destination)
         shutil.chown(destination, user=owner, group=group)
         os.chmod(destination, mode)
-        return 0, "Copied "
+        return "Copied to {}".format(destination)
 
     def copy_template_to_file(self, source, destination, attributes):
 
