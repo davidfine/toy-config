@@ -27,7 +27,8 @@ class TaskHandler(object):
                                         group=task['group'], mode=task['mode'])
                 return output
         elif task['action'] == 'template':
-                output = self.copy_template_to_file(source=task['source'], destination=task['destination'])
+                output = self.copy_template_to_file(source=task['source'],
+                                                    destination=task['destination'], attributes=self.attributes)
                 return output
 
 
@@ -55,7 +56,6 @@ class TaskHandler(object):
         return "Copied to {}".format(destination)
 
     def copy_template_to_file(self, source, destination, attributes):
-
         template = self.jinja_environmenent.get_template(source)
         with open(destination, 'w') as f:
             f.write(template.render(attributes=attributes))
