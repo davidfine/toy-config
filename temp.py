@@ -4,8 +4,31 @@ import yaml
 from TaskHandler import TaskHandler
 import logging
 from jinja2 import Environment, FileSystemLoader, Template
+import subprocess
 
 
+#CalledProcessError
+#TimeoutExpired
+
+def run_command(command):
+    try:
+        output = subprocess.check_output(command, universal_newlines=True, shell=True, timeout=60)
+    except subprocess.CalledProcessError as e:
+        return e
+    except subprocess.TimeoutExpired as e:
+        return e
+    return output
+
+
+long_list = [ x for x in range(22)]
+command = "echo 22".format(long_list)
+
+output = run_command(command)
+print(dir(output))
+print(output)
+
+
+'''
 def render(tpl_path, context):
     path, filename = os.path.split(tpl_path)
     env = Environment(loader=FileSystemLoader(path))
@@ -17,9 +40,11 @@ context = {
     'firstname': 'John',
     'lastname': 'Doe'
 }
-
 result = render('/src/toy-role/templates/test.txt', context)
 print(result)
+'''
+
+
 '''
 
 def render_template(source, destination, attributes):

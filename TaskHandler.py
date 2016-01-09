@@ -31,13 +31,14 @@ class TaskHandler(object):
                 return output
 
 
+
     def run_command(self, command):
-        '''
-        :param command: shell command followed by argument(s)
-        :return: stdout, stderr from shell
-        '''
-        print('running command: {}'.format(command))
-        output = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, shell=True)
+        try:
+            output = subprocess.check_output(command, universal_newlines=True, shell=True, timeout=60)
+        except subprocess.CalledProcessError as e:
+            return e
+        except subprocess.TimeoutExpired as e:
+            return e
         return output
 
 
