@@ -2,7 +2,7 @@
 
 # vi: set ft=ruby :
 
-Vagrant.configure("2") do |config|
+Vagrant.configure(2) do |config|
   config.vm.provision "shell",
     inline: "apt-get update && apt-get install -y git python3-pip python-virtualenv"
 end

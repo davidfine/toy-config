@@ -18,10 +18,14 @@ class TaskHandler(object):
 
     def handle_task(self, task):
         if task['action'] == 'commands':
+            output = ""
             for command in task['commands']:
-                print(command)
-                output = self.run_command(command)
-                return output
+                try:
+                    output += self.run_command(command)
+                except Exception as e:
+                    raise e
+            return output
+
         elif task['action'] == 'file':
                 output = self.copy_file(source=task['source'], destination=task['destination'], owner=task['owner'],
                                         group=task['group'], mode=task['mode'])
@@ -32,15 +36,14 @@ class TaskHandler(object):
                 return output
 
 
-
     def run_command(self, command):
         try:
             output = subprocess.check_output(command, universal_newlines=True, shell=True, timeout=60)
-        except subprocess.CalledProcessError as e:
-            return e
-        except subprocess.TimeoutExpired as e:
-            return e
-        return output
+        except subprocess.CalledProcessError:
+            raise
+        except subprocess.TimeoutExpired:
+            raise
+        return '<- {}'.format(output)
 
 
     def copy_file(self, source, destination, owner='root', group='root', mode='640'):
@@ -53,10 +56,10 @@ class TaskHandler(object):
         shutil.copyfile(path, destination)
         shutil.chown(destination, user=owner, group=group)
         os.chmod(destination, mode)
-        return "Copied to {}".format(destination)
+        return '<- Copied {} to {}'.format(source, destination)
 
     def copy_template_to_file(self, source, destination, attributes):
         template = self.jinja_environmenent.get_template(source)
         with open(destination, 'w') as f:
             f.write(template.render(attributes=attributes))
-        return "wrote file {}".format(destination)
+        return '<- wrote file from template: {}'.format(destination)
