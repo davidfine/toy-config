@@ -48,7 +48,7 @@ def do_ssh_client(servers, role_name, clone_url, username, password):
     stdout = read_stdout(ssh_client.run_command('{}'.format(command), stop_on_errors=False))
     logger.info(stdout)
     return stdout
-
+if
 
 def read_stdout(output):
     # Todo: Make this capture and filter stdout all pretty-like
